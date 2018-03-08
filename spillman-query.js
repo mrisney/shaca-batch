@@ -63,7 +63,7 @@ async function postAndProcessQuery(dateLastModified) {
 
     //2. post xml
     var xml = new XMLSerializer().serializeToString(spillmanQuery);
-    
+
     requestOptions.body = xml;
     requestOptions.headers["Content-Length"] = Buffer.byteLength(xml)
     const responseXML = await rp(requestOptions);
@@ -78,7 +78,7 @@ async function postAndProcessQuery(dateLastModified) {
         trafficAccidentXML = '<?xml version="1.0" encoding="UTF-8"?>' + trafficAccidentXML;
         try {
             let res = await insertAccidentXML(accidentNumber, trafficAccidentXML, dateLastModified);
-            console.log("accidents added for : "+dateLastModified);
+            console.log("accidents added for : " + dateLastModified);
         } catch (err) {
             console.error(err);
         }
@@ -88,10 +88,14 @@ async function postAndProcessQuery(dateLastModified) {
 var start = new Date("03/01/2018");
 var end = new Date("03/05/2018");
 
-var loop = new Date(start);
-while (loop <= end) {
-    var queryDate = loop.toLocaleDateString('en-US');
-    await postAndProcessQuery(queryDate);
-    var newDate = loop.setDate(loop.getDate() + 1);
-    loop = new Date(newDate);
+async function processDates() {
+    var loop = new Date(start);
+    while (loop <= end) {
+        var queryDate = loop.toLocaleDateString('en-US');
+        await postAndProcessQuery(queryDate);
+        var newDate = loop.setDate(loop.getDate() + 1);
+        loop = new Date(newDate);
+    }
 }
+
+processDates();
