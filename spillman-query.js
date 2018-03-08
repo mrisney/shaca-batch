@@ -54,7 +54,6 @@ var requestOptions = {
         'Content-Type': 'text/xml',
         'Content-Length': Buffer.byteLength(xml)
     },
-    body: xml,
     json: false
 };
 
@@ -65,6 +64,8 @@ async function postAndProcessQuery(dateLastModified) {
 
     //2. post xml
     var xml = new XMLSerializer().serializeToString(spillmanQuery);
+    
+    requestOptions.body = xml;
     const responseXML = await rp(requestOptions);
 
     var xmlAccidents = new DOMParser().parseFromString(responseXML);
