@@ -4,9 +4,10 @@ const XMLSerializer = require('xmldom').XMLSerializer;
 const oracledb = require('oracledb');
 const rp = require('request-promise');
 
-var dateLastModified = "03/07/2018";
+const baseXMLQuery = fs.readFileSync(__dirname + '/spillman-query.xml', 'utf8');
+var spillmanQuery = new DOMParser().parseFromString(baseXMLQuery);
 
-async function insertAccidentXML(accidentId, accidentXML) {
+async function insertAccidentXML(accidentId, accidentXML, dateLastModified) {
     return new Promise(async function (resolve, reject) {
         let conn;
 
@@ -42,12 +43,6 @@ async function insertAccidentXML(accidentId, accidentXML) {
     });
 }
 
-var content = fs.readFileSync(__dirname + '/spillman-query.xml', 'utf8');
-var spillmanQuery = new DOMParser().parseFromString(content);
-
-spillmanQuery.getElementsByTagName("DateLastModified")[0].childNodes[0].data = dateLastModified;
-
-var xml = new XMLSerializer().serializeToString(spillmanQuery);
 
 var requestOptions = {
     uri: 'https://shaca.kauai.gov:4444/DataExchange/REST',
@@ -63,9 +58,13 @@ var requestOptions = {
     json: false
 };
 
-async function postAndProcessQuery() {
+async function postAndProcessQuery(dateLastModified) {
 
-    //1. post xml
+    //1. set the date last modified
+    spillmanQuery.getElementsByTagName("DateLastModified")[0].childNodes[0].data = dateLastModified;
+
+    //2. post xml
+    var xml = new XMLSerializer().serializeToString(spillmanQuery);
     const responseXML = await rp(requestOptions);
 
     var xmlAccidents = new DOMParser().parseFromString(responseXML);
@@ -77,11 +76,22 @@ async function postAndProcessQuery() {
         var trafficAccidentXML = new XMLSerializer().serializeToString(trafficAccidents[i]);
         trafficAccidentXML = '<?xml version="1.0" encoding="UTF-8"?>' + trafficAccidentXML;
         try {
-            let res = await insertAccidentXML(accidentNumber, trafficAccidentXML);
-            console.log(res);
+            let res = await insertAccidentXML(accidentNumber, trafficAccidentXML, dateLastModified);
+            console.log("accidents added for : "+dateLastModified);
         } catch (err) {
             console.error(err);
         }
     }
 }
-postAndProcessQuery();
+
+var start = new Date("03/01/2018");
+var end = new Date("03/05/2018");
+
+var loop = new Date(start);
+while (loop <= end) {
+    var queryDate = loop.toLocaleDateString('en-US');
+    postAndProcessQuery(queryDate);
+
+    var newDate = loop.setDate(loop.getDate() + 1);
+    loop = new Date(newDate);
+}
