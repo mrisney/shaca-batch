@@ -78,6 +78,7 @@ async function postAndProcessQuery(queryDate) {
         var dateOfAccident = trafficAccidents[i].getElementsByTagName("DateOfAccident")[0].childNodes[0].nodeValue;
         var trafficAccidentXML = new XMLSerializer().serializeToString(trafficAccidents[i]);
         trafficAccidentXML = '<?xml version="1.0" encoding="UTF-8"?>' + trafficAccidentXML;
+        console.log("date of accident : " + dateOfAccident);
         try {
             let res = await insertAccidentXML(accidentNumber, dateOfAccident, trafficAccidentXML, queryDate);
             console.log("accidents added for : " + dateOfAccident);
