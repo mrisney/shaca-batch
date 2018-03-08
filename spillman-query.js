@@ -7,6 +7,18 @@ const rp = require('request-promise');
 const baseXMLQuery = fs.readFileSync(__dirname + '/spillman-query.xml', 'utf8');
 var spillmanQuery = new DOMParser().parseFromString(baseXMLQuery);
 
+var requestOptions = {
+    uri: 'https://shaca.kauai.gov:4444/DataExchange/REST',
+    rejectUnauthorized: false,
+    method: 'POST',
+    // authentication headers
+    headers: {
+        'Authorization': 'Basic ' + new Buffer('SHACA' + ':' + 'shaca2018').toString('base64'),
+        'Content-Type': 'text/xml',
+    },
+    json: false
+};
+
 async function insertAccidentXML(accidentNumber, dateOfAccident, accidentXML, queryDate) {
     return new Promise(async function (resolve, reject) {
         let conn;
@@ -45,19 +57,6 @@ async function insertAccidentXML(accidentNumber, dateOfAccident, accidentXML, qu
     });
 }
 
-
-var requestOptions = {
-    uri: 'https://shaca.kauai.gov:4444/DataExchange/REST',
-    rejectUnauthorized: false,
-    method: 'POST',
-    // authentication headers
-    headers: {
-        'Authorization': 'Basic ' + new Buffer('SHACA' + ':' + 'shaca2018').toString('base64'),
-        'Content-Type': 'text/xml',
-    },
-    json: false
-};
-
 async function postAndProcessQuery(queryDate) {
 
     //1. set the date last modified
@@ -79,7 +78,7 @@ async function postAndProcessQuery(queryDate) {
         var dateOfAccident = trafficAccidents[i].getElementsByTagName("DateOfAccident")[0].childNodes[0].nodeValue;
         var trafficAccidentXML = new XMLSerializer().serializeToString(trafficAccidents[i]);
         trafficAccidentXML = '<?xml version="1.0" encoding="UTF-8"?>' + trafficAccidentXML;
-
+        
         try {
             let res = await insertAccidentXML(accidentNumber, dateOfAccident.trim(), trafficAccidentXML, queryDate);
         } catch (err) {
@@ -88,15 +87,15 @@ async function postAndProcessQuery(queryDate) {
     }
 }
 
-var start = new Date("01/01/2018");
-var end = new Date("03/07/2018");
+var start = new Date("03/07/2018");
+var end = new Date("03/08/2018");
 
 async function processDates() {
     var loop = new Date(start);
     while (loop <= end) {
         var queryDate = loop.toLocaleDateString('en-US');
         await postAndProcessQuery(queryDate);
-        console.log("querying : "+queryDate);
+        console.log("querying and inserting accidents for "+queryDate);
         var newDate = loop.setDate(loop.getDate() + 1);
         loop = new Date(newDate);
     }
