@@ -7,7 +7,7 @@ const rp = require('request-promise');
 const baseXMLQuery = fs.readFileSync(__dirname + '/spillman-query.xml', 'utf8');
 var spillmanQuery = new DOMParser().parseFromString(baseXMLQuery);
 
-async function insertAccidentXML(accidentId, accidentXML, dateLastModified) {
+async function insertAccidentXML(accidentId, accidentXML, queryDate) {
     return new Promise(async function (resolve, reject) {
         let conn;
 
@@ -24,7 +24,7 @@ async function insertAccidentXML(accidentId, accidentXML, dateLastModified) {
                 "BEGIN accident_clob_in(:p_id, :p_xmlclob, :p_last_mod); END;", {
                     p_id: accidentId,
                     p_xmlclob: accidentXML,
-                    p_last_mod: dateLastModified
+                    p_last_mod: queryDate
                 });
 
             resolve(JSON.stringify(result));
@@ -56,10 +56,10 @@ var requestOptions = {
     json: false
 };
 
-async function postAndProcessQuery(dateLastModified) {
+async function postAndProcessQuery(queryDate) {
 
     //1. set the date last modified
-    spillmanQuery.getElementsByTagName("DateLastModified")[0].childNodes[0].data = dateLastModified;
+    spillmanQuery.getElementsByTagName("DateOfAccident")[0].childNodes[0].data = queryDate;
 
     //2. post xml
     var xml = new XMLSerializer().serializeToString(spillmanQuery);
@@ -77,7 +77,7 @@ async function postAndProcessQuery(dateLastModified) {
         var trafficAccidentXML = new XMLSerializer().serializeToString(trafficAccidents[i]);
         trafficAccidentXML = '<?xml version="1.0" encoding="UTF-8"?>' + trafficAccidentXML;
         try {
-            let res = await insertAccidentXML(accidentNumber, trafficAccidentXML, dateLastModified);
+            let res = await insertAccidentXML(accidentNumber, trafficAccidentXML, queryDate);
             console.log("accidents added for : " + dateLastModified);
         } catch (err) {
             console.error(err);
