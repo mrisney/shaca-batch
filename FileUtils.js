@@ -18,7 +18,7 @@ class FileUtils {
                     resolve(data.toString('utf8'));
                     zip.close();
                 } catch (e) {
-                    reject(Error(e.toString()));
+                    reject(Error(fileName+ " : bad zip file"));
                 }
             });
         });

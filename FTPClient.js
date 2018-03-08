@@ -62,6 +62,7 @@ class FTPClient {
                     reject(Error(error.toString()));
                 } else {
                     resolve(response);
+                    console.log("file moved");
                 }
             });
         });

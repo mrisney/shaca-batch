@@ -29,20 +29,26 @@ async function downloadFile() {
 }
 
 
+var bindvars = {
+    p_filename: 'test',
+    p_description : 'daily batch',
+    p_errors : 'none'
+};
 
 
 downloadFile().then((json) => {
-    
+
     var formatUtils = new Formatting(json);
     var sqlStatements = formatUtils.jsonToSQLStatements();
     var counter = sqlStatements.length;
-    
+
     for (var i = 0, len = sqlStatements.length; i < len; i++) {
         db.execute(sqlStatements[i]);
         counter -= 1;
-        if ( counter === 0){
+        if (counter === 0) {
             console.log(formatUtils.metaData);
             client.fileComplete(latestFile);
         }
-      }
-    });
+    }
+    db.execute("BEGIN journal_entry('"+latestFile+"','daily update','none'); END;");
+});

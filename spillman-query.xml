@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PublicSafetyEnvelope version="1.0">
+    <MessageIdentification>1</MessageIdentification>
+    <From>SHACA</From>
+    <To/>
+    <Creation/>
+    <PublicSafety>
+        <Query>
+            <TrafficAccidentTable>
+                <DateLastModified search_type="greater_than">03/03/2018</DateLastModified>
+                <AccidentNamesTable parentField="AccidentNumber" childField="AccidentNumber">
+                    <MainNamesTable parentField="NameNumber" childField="NameNumber" />
+                </AccidentNamesTable>
+                <AccidentVehiclesTable parentField="AccidentNumber" childField="AccidentNumber">
+                    <MainVehicleScreen parentField="VehicleNumber" childField="IDNumberOfVehicle" />
+                </AccidentVehiclesTable>
+                <GeobaseAddressIDMaintenance parentField="GeobaseAddressID" childField="IDNumberOfAddress" />
+                <FileCapture parentField="AccidentNumber" childField="Parnum">
+                    <Partype search_type="equal_to">acmain</Partype>
+                </FileCapture>
+            </TrafficAccidentTable>
+        </Query>
+    </PublicSafety>
+</PublicSafetyEnvelope>
