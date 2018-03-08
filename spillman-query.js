@@ -20,8 +20,9 @@ async function insertAccidentXML(accidentNumber, dateOfAccident, accidentXML, qu
                 password: "kpd_stage",
                 connectString: "db4"
             });
+            
             let result = await conn.execute(
-                "BEGIN accident_clob_in(:p_acc_num, :p_acc_dt :p_xmlclob, :p_last_mod); END;", {
+                "BEGIN accident_clob_in(:p_acc_num, :p_acc_dt, :p_xmlclob, :p_last_mod); END;", {
                     p_acc_num: accidentNumber,
                     p_acc_dt: dateOfAccident,
                     p_xmlclob: accidentXML,
@@ -78,7 +79,7 @@ async function postAndProcessQuery(queryDate) {
         var dateOfAccident = trafficAccidents[i].getElementsByTagName("DateOfAccident")[0].childNodes[0].nodeValue;
         var trafficAccidentXML = new XMLSerializer().serializeToString(trafficAccidents[i]);
         trafficAccidentXML = '<?xml version="1.0" encoding="UTF-8"?>' + trafficAccidentXML;
-        console.log("date of accident : " + dateOfAccident);
+
         try {
             let res = await insertAccidentXML(accidentNumber, dateOfAccident.trim(), trafficAccidentXML, queryDate);
             console.log("accidents added for : " + dateOfAccident);
