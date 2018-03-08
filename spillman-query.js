@@ -80,7 +80,7 @@ async function postAndProcessQuery(queryDate) {
         trafficAccidentXML = '<?xml version="1.0" encoding="UTF-8"?>' + trafficAccidentXML;
         try {
             let res = await insertAccidentXML(accidentNumber, dateOfAccident, trafficAccidentXML, queryDate);
-            console.log("accidents added for : " + queryDate);
+            console.log("accidents added for : " + dateOfAccident);
         } catch (err) {
             console.error(err);
         }
