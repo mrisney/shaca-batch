@@ -7,8 +7,7 @@
     <PublicSafety>
         <Query>
             <TrafficAccidentTable>
-                <!--<DateLastModified search_type="greater_than">03/03/2018</DateLastModified>-->
-                <DateOfAccident search_type="equal_to" >01/01/2017</DateOfAccident>
+                <DateLastModified search_type="greater_than">03/03/2018</DateLastModified>
                 <AccidentNamesTable parentField="AccidentNumber" childField="AccidentNumber">
                     <MainNamesTable parentField="NameNumber" childField="NameNumber" />
                 </AccidentNamesTable>

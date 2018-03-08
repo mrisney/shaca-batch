@@ -59,7 +59,7 @@ var requestOptions = {
 async function postAndProcessQuery(queryDate) {
 
     //1. set the date last modified
-    spillmanQuery.getElementsByTagName("DateOfAccident")[0].childNodes[0].data = queryDate;
+    spillmanQuery.getElementsByTagName("DateLastModified")[0].childNodes[0].data = queryDate;
 
     //2. post xml
     var xml = new XMLSerializer().serializeToString(spillmanQuery);
@@ -78,7 +78,7 @@ async function postAndProcessQuery(queryDate) {
         trafficAccidentXML = '<?xml version="1.0" encoding="UTF-8"?>' + trafficAccidentXML;
         try {
             let res = await insertAccidentXML(accidentNumber, trafficAccidentXML, queryDate);
-            console.log("accidents added for : " + dateLastModified);
+            console.log("accidents added for : " + queryDate);
         } catch (err) {
             console.error(err);
         }
@@ -86,7 +86,7 @@ async function postAndProcessQuery(queryDate) {
 }
 
 var start = new Date("03/01/2018");
-var end = new Date("03/05/2018");
+var end = new Date("03/07/2018");
 
 async function processDates() {
     var loop = new Date(start);
