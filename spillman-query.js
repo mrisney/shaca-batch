@@ -21,11 +21,11 @@ async function insertAccidentXML(accidentNumber, dateOfAccident, accidentXML, qu
                 connectString: "db4"
             });
             let result = await conn.execute(
-                "BEGIN accident_clob_in(:p_accident_num, :p_accident_date :p_xmlclob, :p_last_modified); END;", {
-                    p_accident_num: accidentNumber,
-                    p_accident_date: dateOfAccident,
+                "BEGIN accident_clob_in(:p_acc_num, :p_acc_dt :p_xmlclob, :p_last_mod); END;", {
+                    p_acc_num: accidentNumber,
+                    p_acc_dt: dateOfAccident,
                     p_xmlclob: accidentXML,
-                    p_last_modified: queryDate
+                    p_last_mod: queryDate
                 });
 
             resolve(JSON.stringify(result));
