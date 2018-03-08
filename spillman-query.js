@@ -7,7 +7,7 @@ const rp = require('request-promise');
 const baseXMLQuery = fs.readFileSync(__dirname + '/spillman-query.xml', 'utf8');
 var spillmanQuery = new DOMParser().parseFromString(baseXMLQuery);
 
-async function insertAccidentXML(accidentId, accidentXML, queryDate) {
+async function insertAccidentXML(accidentNumber, accidentXML, queryDate) {
     return new Promise(async function (resolve, reject) {
         let conn;
 
@@ -21,8 +21,8 @@ async function insertAccidentXML(accidentId, accidentXML, queryDate) {
                 connectString: "db4"
             });
             let result = await conn.execute(
-                "BEGIN accident_clob_in(:p_id, :p_xmlclob, :p_last_mod); END;", {
-                    p_id: accidentId,
+                "BEGIN accident_clob_in(:p_acc_num, :p_xmlclob, :p_last_mod); END;", {
+                    p_acc_num: accidentNumber,
                     p_xmlclob: accidentXML,
                     p_last_mod: queryDate
                 });
@@ -85,7 +85,7 @@ async function postAndProcessQuery(queryDate) {
     }
 }
 
-var start = new Date("03/01/2018");
+var start = new Date("01/01/2018");
 var end = new Date("03/07/2018");
 
 async function processDates() {
