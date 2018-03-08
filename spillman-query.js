@@ -91,8 +91,7 @@ var end = new Date("03/05/2018");
 var loop = new Date(start);
 while (loop <= end) {
     var queryDate = loop.toLocaleDateString('en-US');
-    postAndProcessQuery(queryDate);
-
+    await postAndProcessQuery(queryDate);
     var newDate = loop.setDate(loop.getDate() + 1);
     loop = new Date(newDate);
 }
