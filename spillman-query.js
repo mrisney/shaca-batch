@@ -52,7 +52,6 @@ var requestOptions = {
     headers: {
         'Authorization': 'Basic ' + new Buffer('SHACA' + ':' + 'shaca2018').toString('base64'),
         'Content-Type': 'text/xml',
-        'Content-Length': Buffer.byteLength(xml)
     },
     json: false
 };
@@ -66,6 +65,7 @@ async function postAndProcessQuery(dateLastModified) {
     var xml = new XMLSerializer().serializeToString(spillmanQuery);
     
     requestOptions.body = xml;
+    requestOptions.headers["Content-Length"] = Buffer.byteLength(xml)
     const responseXML = await rp(requestOptions);
 
     var xmlAccidents = new DOMParser().parseFromString(responseXML);
