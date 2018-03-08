@@ -70,7 +70,7 @@ async function postAndProcessQuery(queryDate) {
     requestOptions.headers["Content-Length"] = Buffer.byteLength(xml)
     const responseXML = await rp(requestOptions);
 
-    var xmlAccidents = await new DOMParser().parseFromString(responseXML);
+    var xmlAccidents = new DOMParser().parseFromString(responseXML);
     var trafficAccidents = xmlAccidents.getElementsByTagName("TrafficAccidentTable");
 
     for (var i = 0; i < trafficAccidents.length; i++) {
@@ -82,7 +82,6 @@ async function postAndProcessQuery(queryDate) {
 
         try {
             let res = await insertAccidentXML(accidentNumber, dateOfAccident.trim(), trafficAccidentXML, queryDate);
-            console.log("accidents added for : " + dateOfAccident);
         } catch (err) {
             console.error(err);
         }
@@ -97,6 +96,7 @@ async function processDates() {
     while (loop <= end) {
         var queryDate = loop.toLocaleDateString('en-US');
         await postAndProcessQuery(queryDate);
+        console.log("querying : "+queryDate);
         var newDate = loop.setDate(loop.getDate() + 1);
         loop = new Date(newDate);
     }
