@@ -4,9 +4,11 @@ const XMLSerializer = require('xmldom').XMLSerializer;
 const oracledb = require('oracledb');
 const rp = require('request-promise');
 
+// The base XML query, to be posted to the Spillman REST API
 const baseXMLQuery = fs.readFileSync(__dirname + '/spillman-query.xml', 'utf8');
 var spillmanQuery = new DOMParser().parseFromString(baseXMLQuery);
 
+// The Request options for the Spillman REST API 
 var requestOptions = {
     uri: 'https://shaca.kauai.gov:4444/DataExchange/REST',
     rejectUnauthorized: false,
@@ -21,9 +23,11 @@ var requestOptions = {
 
 async function insertAccidentXML(accidentNumber, dateOfAccident, accidentXML, queryDate) {
     return new Promise(async function (resolve, reject) {
+        
         let conn;
 
         try {
+            
             oracledb.autoCommit = true
             oracledb.outFormat = oracledb.OBJECT
 
@@ -59,14 +63,17 @@ async function insertAccidentXML(accidentNumber, dateOfAccident, accidentXML, qu
 
 async function postAndProcessQuery(queryDate) {
 
-    //1. set the date last modified
+    // 1. set the date last modified
     spillmanQuery.getElementsByTagName("DateLastModified")[0].childNodes[0].data = queryDate;
 
-    //2. post xml
+    // 2. get the xml with the new query date
     var xml = new XMLSerializer().serializeToString(spillmanQuery);
 
+    // 3. set the bod of the request options with the xml
     requestOptions.body = xml;
     requestOptions.headers["Content-Length"] = Buffer.byteLength(xml)
+    
+    // 4. wait for the response
     const responseXML = await rp(requestOptions);
 
     var xmlAccidents = new DOMParser().parseFromString(responseXML);
@@ -77,6 +84,7 @@ async function postAndProcessQuery(queryDate) {
         var accidentNumber = trafficAccidents[i].getElementsByTagName("AccidentNumber")[0].childNodes[0].nodeValue;
         var dateOfAccident = trafficAccidents[i].getElementsByTagName("DateOfAccident")[0].childNodes[0].nodeValue;
         var trafficAccidentXML = new XMLSerializer().serializeToString(trafficAccidents[i]);
+        
         trafficAccidentXML = '<?xml version="1.0" encoding="UTF-8"?>' + trafficAccidentXML;
         
         try {
