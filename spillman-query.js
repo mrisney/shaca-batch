@@ -69,7 +69,7 @@ async function postAndProcessQuery(queryDate) {
     requestOptions.headers["Content-Length"] = Buffer.byteLength(xml)
     const responseXML = await rp(requestOptions);
 
-    var xmlAccidents = new DOMParser().parseFromString(responseXML);
+    var xmlAccidents = await new DOMParser().parseFromString(responseXML);
     var trafficAccidents = xmlAccidents.getElementsByTagName("TrafficAccidentTable");
 
     for (var i = 0; i < trafficAccidents.length; i++) {
