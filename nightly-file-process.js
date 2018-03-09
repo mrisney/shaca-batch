@@ -54,7 +54,7 @@ var event = schedule.scheduleJob({hour: 04, minute: 30}, function () {
             }
         }
         var metaData = JSON.stringify(formatUtils.metaData);
-        db.execute("BEGIN journal_entry('" + latestFile + "','daily update','none','"+metaData+"'); END;");
-        log.info("Upload complete : "+metaData)
+        db.execute("BEGIN journal_entry('" + latestFile + "','daily update','none','" + metaData + "'); END;");
+        log.info("Upload complete : " + metaData)
     });
 });

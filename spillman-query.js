@@ -23,11 +23,11 @@ var requestOptions = {
 
 async function insertAccidentXML(accidentNumber, dateOfAccident, accidentXML, queryDate) {
     return new Promise(async function (resolve, reject) {
-        
+
         let conn;
 
         try {
-            
+
             oracledb.autoCommit = true
             oracledb.outFormat = oracledb.OBJECT
 
@@ -36,7 +36,7 @@ async function insertAccidentXML(accidentNumber, dateOfAccident, accidentXML, qu
                 password: "kpd_stage",
                 connectString: "db4"
             });
-            
+
             let result = await conn.execute(
                 "BEGIN accident_clob_in(:p_acc_num, :p_acc_dt, :p_xmlclob, :p_last_mod); END;", {
                     p_acc_num: accidentNumber,
@@ -67,26 +67,26 @@ async function postAndProcessQuery(queryDate) {
     spillmanQuery.getElementsByTagName("DateLastModified")[0].childNodes[0].data = queryDate;
 
     // 2. get the xml with the new query date
-    var xml = new XMLSerializer().serializeToString(spillmanQuery);
+    let xml = new XMLSerializer().serializeToString(spillmanQuery);
 
     // 3. set the bod of the request options with the xml
     requestOptions.body = xml;
     requestOptions.headers["Content-Length"] = Buffer.byteLength(xml)
-    
+
     // 4. wait for the response
-    const responseXML = await rp(requestOptions);
+    let responseXML = await rp(requestOptions);
 
-    var xmlAccidents = new DOMParser().parseFromString(responseXML);
-    var trafficAccidents = xmlAccidents.getElementsByTagName("TrafficAccidentTable");
+    let xmlAccidents = new DOMParser().parseFromString(responseXML);
+    let trafficAccidents = xmlAccidents.getElementsByTagName("TrafficAccidentTable");
 
-    for (var i = 0; i < trafficAccidents.length; i++) {
+    for (let i = 0; i < trafficAccidents.length; i++) {
 
         var accidentNumber = trafficAccidents[i].getElementsByTagName("AccidentNumber")[0].childNodes[0].nodeValue;
         var dateOfAccident = trafficAccidents[i].getElementsByTagName("DateOfAccident")[0].childNodes[0].nodeValue;
         var trafficAccidentXML = new XMLSerializer().serializeToString(trafficAccidents[i]);
-        
+
         trafficAccidentXML = '<?xml version="1.0" encoding="UTF-8"?>' + trafficAccidentXML;
-        
+
         try {
             let res = await insertAccidentXML(accidentNumber, dateOfAccident.trim(), trafficAccidentXML, queryDate);
         } catch (err) {
@@ -99,11 +99,11 @@ var start = new Date("03/07/2018");
 var end = new Date("03/08/2018");
 
 async function processDates() {
-    var loop = new Date(start);
+    let loop = new Date(start);
     while (loop <= end) {
         var queryDate = loop.toLocaleDateString('en-US');
         await postAndProcessQuery(queryDate);
-        console.log("querying and inserting accidents for "+queryDate);
+        console.log("querying and inserting accidents for " + queryDate);
         var newDate = loop.setDate(loop.getDate() + 1);
         loop = new Date(newDate);
     }
