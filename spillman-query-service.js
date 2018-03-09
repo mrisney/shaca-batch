@@ -4,7 +4,9 @@ const XMLSerializer = require('xmldom').XMLSerializer;
 const oracledb = require('oracledb');
 const rp = require('request-promise');
 const schedule = require('node-schedule');
+
 var EventLogger = require('node-windows').EventLogger;
+var log = new EventLogger('SHACA Batch Process');
 
 // The base XML query, to be posted to the Spillman REST API
 const baseXMLQuery = fs.readFileSync(__dirname + '/spillman-query.xml', 'utf8');
@@ -56,7 +58,7 @@ async function insertAccidentXML(accidentNumber, dateOfAccident, accidentXML, qu
                 try {
                     await conn.release();
                 } catch (e) {
-                    console.error(e);
+                    log.error(e);
                 }
             }
         }
@@ -92,7 +94,7 @@ async function postAndProcessQuery(queryDate) {
         try {
             let res = await insertAccidentXML(accidentNumber, dateOfAccident.trim(), trafficAccidentXML, queryDate);
         } catch (err) {
-            console.error(err);
+            log.error(err);
         }
     }
 }
