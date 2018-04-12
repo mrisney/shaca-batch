@@ -95,8 +95,8 @@ async function postAndProcessQuery(queryDate) {
     }
 }
 
-var start = new Date("03/07/2018");
-var end = new Date("03/08/2018");
+var start = new Date("01/01/2017");
+var end = new Date("03/16/2018");
 
 async function processDates() {
     let loop = new Date(start);
