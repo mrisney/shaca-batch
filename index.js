@@ -1,11 +1,13 @@
 const FTPClient = require("./FTPClient.js");
 const FileUtils = require("./FileUtils.js");
+const S3ZipFileUploader = require("./s3-uploader.js");
 const Formatting = require("./Formatting.js");
 const db = require("./driver.js");
 const fs = require('fs');
 
 var client = new FTPClient();
 var fileUtils = new FileUtils();
+var zipFileUploader = new S3ZipFileUploader();
 var latestFile = "";
 
 async function downloadFile() {
@@ -18,11 +20,14 @@ async function downloadFile() {
 
     // 3. read the zip file, get the json from json.txt.
     const json = await fileUtils.readZipfile(latestFile);
-
-    // 4. delete the locally downloaded file
+    
+    // 4. upload direcectories to Amazon S3
+    await zipFileUploader.upload(latestFile);
+    
+    // 5. delete the locally downloaded file
     await fileUtils.deleteFile(latestFile);
 
-    // 5. create database connection
+    // 6. create database connection
     await db.connect();
 
     return json;
